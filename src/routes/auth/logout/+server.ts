@@ -1,5 +1,6 @@
 /*
-    Redirect to logout functionality hosted by AWS Cognito.
+    Delete auth cookies and redirect to logout functionality hosted by 
+    AWS Cognito, which logs user out of Cognito.
 
     We *could* avoid this redirect by hard-coding the URL to the 
     Cognito-hosted logout functionality into the client, but doing it 
