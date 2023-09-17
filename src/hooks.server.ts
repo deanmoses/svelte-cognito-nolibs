@@ -35,8 +35,8 @@ export const handle = (async ({ event, resolve }) => {
 		if (!event.locals.user) {
 			// Get the refresh token
 			const refreshToken = event.cookies.get("refresh_token");
+			// if the refresh token doesn't exist
 			if (!refreshToken) {
-				// if the refresh token doesn't exist
 				// redirect to sign out and sign in again
 				const signOutUrl = getSignOutUrl();
 				throw redirect(307, signOutUrl);
