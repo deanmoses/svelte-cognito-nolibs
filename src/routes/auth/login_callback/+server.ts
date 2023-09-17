@@ -4,7 +4,7 @@
 	I took this from https://kinderas.com/technology/23/07/21/implementing-login-and-authentication-for-sveltekit-using-aws-cognito
 	
 	The authorization code is passed as a query param called `code`. We need to fetch the code and validate that it exists.
-    We pass the code along with our credentials to the /oauth2/token/ path and get some tokens back. This is done using the getTokens() function.
+    We pass the code along with our credentials to the /oauth2/token/ path and get some tokens back. This is done using the getTokensFromCognito() function.
     Then we store the id token and the refresh token in cookies to be used later (in the server hook).
     Then we redirect back to the home page.
 
@@ -16,7 +16,7 @@
 */
 
 import type { RequestHandler } from "./$types";
-import { getTokens } from "$lib/server/auth/authTokens";
+import { getTokensFromCognito } from "$lib/server/auth/authTokens";
 import { error, redirect } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 	let tokens = null;
 	try {
-		tokens = await getTokens({ code });
+		tokens = await getTokensFromCognito({ code });
 	} catch (e) {
 		console.error(e);
 		return new Response(JSON.stringify(e), { status: 500 });

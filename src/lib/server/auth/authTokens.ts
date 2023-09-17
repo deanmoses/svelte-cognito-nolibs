@@ -40,23 +40,28 @@ interface TokenOptionsRefresh {
 type TokenOptions = TokenOptionsCode | TokenOptionsRefresh;
 
 /**
- * This function can either generate tokens from a code or from a refresh token.
- * If a code is provided, this all tokens is generated (requires a fresh login)
- * If a refresh token is provided, only the access/id token is updated.
+ * This function retrieves authorization tokens from AWS Cognito.
+ * 
+ * It can be used in two ways:
+ * 1) Given a Cognito-provided one-time authorization code, 
+ *    retrieve both a short-lived access/id token and longer-living refresh token.
+ * 2) Given a Cognito-provided longer-living refresh code, 
+ *    update the short-lived access/id token.
+ * 
  * @see https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html
  */
-export async function getTokens(options: TokenOptions) {
+export async function getTokensFromCognito(options: TokenOptions) {
 	const baseUrl = COGNITO_BASE_URI;
 	const clientId = COGNITO_CLIENT_ID;
 	const clientSecret = COGNITO_CLIENT_SECRET;
 
-	// Generate the Authorization header value (basic auth) using the client ID and secret
+	// The token API endpoint
+	const cognitoTokenExchangeUrl = new URL('/oauth2/token/', baseUrl);
+
+	// The token API basic auth header value using the client ID and secret
 	const authHeader = btoa(`${clientId}:${clientSecret}`);
 
-	// The token api endpoint
-	const url = new URL('/oauth2/token/', baseUrl);
-
-	// BodyObject
+	// The token API request body
 	const bodyObj: TokenPayload = {
 		// If a code is passed, use the authorization_code grant type.
 		// If a refresh token is passed, use the refresh_token grant type.
@@ -76,7 +81,7 @@ export async function getTokens(options: TokenOptions) {
 		.join('&');
 
 	// Make the request and return the response
-	const response = await fetch(url.toString(), {
+	const response = await fetch(cognitoTokenExchangeUrl.toString(), {
 		method: 'POST',
 		headers: {
 			// The headers as defined in the Cognito docs

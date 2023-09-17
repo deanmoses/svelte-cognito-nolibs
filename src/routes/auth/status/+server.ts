@@ -8,8 +8,9 @@
 
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
-import jwt_decode from 'jwt-decode';
-import { getTokens } from '$lib/server/auth/authTokens';
+import { getTokensFromCognito } from '$lib/server/auth/authTokens';
+import { CognitoJwtVerifier } from 'aws-jwt-verify';
+import { COGNITO_USER_POOL_ID, COGNITO_CLIENT_ID } from '$env/static/private';
 
 export const GET: RequestHandler = async (request) => {
 	const cookies = request.cookies;
@@ -21,8 +22,8 @@ export const GET: RequestHandler = async (request) => {
 
 	// If ID token exists, user is logged in
 	if (rawIdToken) {
-		// Parse ID token.  It's in JSON Web Token (JWT) format
-		const idToken = jwt_decode<{ email: string; exp: number }>(rawIdToken);
+		// Parse and validate the ID token
+		const idToken = await verifyToken(rawIdToken);
 		user = { email: idToken.email };
 	}
 	// If if no short-lived Cognito ID token, see if we have a longer-lived Cognito refresh token
@@ -35,15 +36,15 @@ export const GET: RequestHandler = async (request) => {
 		if (refreshToken) {
 			try {
 				// Try to update the tokens
-				const updatedTokens = await getTokens({ refreshToken: refreshToken });
+				const updatedTokens = await getTokensFromCognito({ refreshToken: refreshToken });
 
 				// Update the cookie for the id token
 				const idExpires = new Date();
 				idExpires.setSeconds(idExpires.getSeconds() + updatedTokens.expires_in);
 				cookies.set('id_token', updatedTokens.id_token, { path: '/', expires: idExpires });
 
-				// And the locals
-				const idToken = jwt_decode<{ email: string; exp: number }>(updatedTokens.id_token);
+				// Get user out of new ID token
+				const idToken = await verifyToken(updatedTokens.id_token);
 				user = { email: idToken.email };
 			} catch (error) {
 				// If the refresh token is invalid, treat user as not logged in
@@ -54,3 +55,20 @@ export const GET: RequestHandler = async (request) => {
 
 	return json(user);
 };
+
+/**
+ * Verify the JWT token
+ */
+async function verifyToken(token: string): { email: string; exp: number } {
+	const jwtVerifier = CognitoJwtVerifier.create({
+		userPoolId: COGNITO_USER_POOL_ID,
+		tokenUse: 'id',
+		clientId: COGNITO_CLIENT_ID
+	});
+	try {
+		const payload = await jwtVerifier.verify(token);
+		return payload;
+	} catch {
+		console.log('Token not valid!');
+	}
+}
