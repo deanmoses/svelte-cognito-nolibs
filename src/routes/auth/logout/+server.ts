@@ -15,6 +15,5 @@ import { redirect } from "@sveltejs/kit";
 import { getLogoutUrl } from '$lib/server/auth/authUriHelpers';
 
 export const GET: RequestHandler = async () => {
-    console.log("redirecting to:" + getLogoutUrl());
    throw redirect(302, getLogoutUrl());
 };
