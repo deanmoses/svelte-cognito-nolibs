@@ -1,6 +1,10 @@
 /**
- * Return the login status of the current user
- */
+	Return the login status of the current user
+
+	This handles checking authentication status with AWS Cognito.
+
+	Adapted from https://kinderas.com/technology/23/07/21/implementing-login-and-authentication-for-sveltekit-using-aws-cognito
+*/
 
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
@@ -12,7 +16,7 @@ export const GET: RequestHandler = async (request) => {
 
 	let user;
 
-	// Get Cognito user ID token from cookie
+	// Get the short-lived Cognito user ID token from cookie
 	const rawIdToken = cookies.get('id_token');
 
 	// If ID token exists, user is logged in
@@ -21,12 +25,13 @@ export const GET: RequestHandler = async (request) => {
 		const idToken = jwt_decode<{ email: string; exp: number }>(rawIdToken);
 		user = { email: idToken.email };
 	}
-	// If if no ID token, see if we have a refresh token
+	// If if no short-lived Cognito ID token, see if we have a longer-lived Cognito refresh token
 	else {
 		// Get the Cognito refresh token from cookie
 		const refreshToken = cookies.get('refresh_token');
 
 		// If the refresh token doesn't exist, user is not logged in
+		// If the refresh token DOES exist, try to get a new short-lived ID token
 		if (refreshToken) {
 			try {
 				// Try to update the tokens
