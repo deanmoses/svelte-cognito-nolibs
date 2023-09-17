@@ -1,10 +1,7 @@
 /*
-    This function can handle both generating the initial tokens using an authorization code
-    as well as taking a refresh token and fetching updated id and access tokens. 
+	Retrieves authorization tokens from AWS Cognito.
     
-    We'll see how to refresh the tokens using this function later when we implement the server hook.
-
-	This is taken from https://kinderas.com/technology/23/07/21/implementing-login-and-authentication-for-sveltekit-using-aws-cognito
+	Adapted from https://kinderas.com/technology/23/07/21/implementing-login-and-authentication-for-sveltekit-using-aws-cognito
 */
 
 import { COGNITO_BASE_URI, COGNITO_CLIENT_ID, COGNITO_CLIENT_SECRET } from '$env/static/private';
