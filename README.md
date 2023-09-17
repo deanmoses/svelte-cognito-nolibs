@@ -7,8 +7,20 @@ There are lots of ways to use Cognito.  This is a test of:
  * Not using any auth helper libs like Amplify
  * The authentication callback from the Cognito-hosted login screen is handled via a Svelte server-side callback API
 
-It follows this blog post:
+It sort of follows this blog post:
 https://kinderas.com/technology/23/07/21/implementing-login-and-authentication-for-sveltekit-using-aws-cognito
+
+It has the following authentication-related server endpoints:
+- `/auth/login`
+	- Redirects user to a login page hosted by AWS Cognito
+- `/auth/login_callback`
+	- The login page hosted by AWS Cognito, once it authenticates the user, will send them here
+	- It receives an authorization code from Cognito, and calls Cognito back to exchange that code for some tokens: 1) a short-lived ID token and 2) a longer-lived refresh token
+- `/auth/status`
+	- Returns the login status of client
+	- If the short term ID token cookie has expired, it attempts to get a new one using the refresh token cookie
+- `/auth/logout`
+	- Redirects user to the AWS Cognito logout functionality
 
 ## Developing
 
