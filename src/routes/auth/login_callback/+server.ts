@@ -15,15 +15,15 @@
     new access and id tokens are requested.
 */
 
-import type { RequestHandler } from "./$types";
-import { getTokensFromCognito } from "$lib/server/auth/authTokens";
-import { error, redirect } from "@sveltejs/kit";
+import type { RequestHandler } from './$types';
+import { getTokensFromCognito } from '$lib/server/auth/authTokens';
+import { error, redirect } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
-	const code = url.searchParams.get("code");
+	const code = url.searchParams.get('code');
 
 	if (!code) {
-		throw error(500, "No code provided");
+		throw error(500, 'No code provided');
 	}
 
 	let tokens = null;
@@ -42,8 +42,8 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		// have to log in again
 		const refreshExpire = new Date();
 		refreshExpire.setDate(refreshExpire.getDate() + 29);
-		cookies.set("refresh_token", tokens.refresh_token, {
-			path: "/",
+		cookies.set('refresh_token', tokens.refresh_token, {
+			path: '/',
 			expires: refreshExpire
 		});
 
@@ -51,12 +51,12 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		// and set a cookie.
 		const idExpires = new Date();
 		idExpires.setSeconds(idExpires.getSeconds() + tokens.expires_in);
-		cookies.set("id_token", tokens.id_token, { path: "/", expires: idExpires });
+		cookies.set('id_token', tokens.id_token, { path: '/', expires: idExpires });
 
-		console.log("User is authenticated.  ID token expires at " + idExpires.toString());
+		console.log('User is authenticated.  ID token expires at ' + idExpires.toString());
 
 		// Redirect back to the home page
-		throw redirect(307, "/");
+		throw redirect(307, '/');
 	} else {
 		return new Response(JSON.stringify(tokens), { status: 500 });
 	}

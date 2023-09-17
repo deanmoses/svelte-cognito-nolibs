@@ -10,10 +10,13 @@
     change to its client artifacts on server side).
 */
 
-import type { RequestHandler } from "./$types";
-import { redirect } from "@sveltejs/kit";
+import type { RequestHandler } from './$types';
+import { redirect } from '@sveltejs/kit';
 import { getLogoutUrl } from '$lib/server/auth/authUriHelpers';
 
-export const GET: RequestHandler = async () => {
-   throw redirect(302, getLogoutUrl());
+export const GET: RequestHandler = async (request) => {
+    await request.cookies.delete('id_token', { path: '/' });
+    await request.cookies.delete('refresh_token', { path: '/' });
+
+	throw redirect(302, getLogoutUrl());
 };

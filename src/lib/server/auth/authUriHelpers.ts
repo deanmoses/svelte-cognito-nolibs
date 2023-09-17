@@ -32,9 +32,8 @@ export function getLoginCallbackUrl(): string {
  */
 export function getLogoutUrl(): string {
 	const url = new URL('/logout', COGNITO_BASE_URI);
-	url.searchParams.set('response_type', 'code');
 	url.searchParams.set('client_id', COGNITO_CLIENT_ID);
-	url.searchParams.set('redirect_uri', getLogoutCallbackUrl());
+	url.searchParams.set('logout_uri', getLogoutCallbackUrl());
 	return url.toString();
 }
 
