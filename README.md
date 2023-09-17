@@ -2,10 +2,10 @@
 
 This is a test of using AWS Cognito to provide authentication to a Svelte app.
 
-There's lots of ways to integrate Cognito.  This is a test of:
+There are lots of ways to use Cognito.  This is a test of:
  * Using the Cognito-hosted login screen
  * Not using any auth helper libs like Amplify
- * The authentication callback from the Cognito-hosted login screen is handled via a Svelte server-side callback API.  I'd prefer to use a client-side callback so that I can serve a static SPA app...
+ * The authentication callback from the Cognito-hosted login screen is handled via a Svelte server-side callback API
 
 It follows this blog post:
 https://kinderas.com/technology/23/07/21/implementing-login-and-authentication-for-sveltekit-using-aws-cognito

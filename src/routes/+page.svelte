@@ -1,6 +1,5 @@
 <script lang="ts">
-	import type { PageData } from "./$types";
-	export let data: PageData;
+	import Menu from "$lib/components/auth/menu.svelte";
 </script>
 
 <svelte:head>
@@ -10,11 +9,7 @@
 
 <section>
 	<h1>Auth Demo</h1>
-	{#if data.email}
-		<p>Logged in as {data.email}</p>
-	{:else}
-		<a href={data.signInUrl}>Sign in</a>
-	{/if}
+	<Menu />
 </section>
 
 <style>

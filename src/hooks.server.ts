@@ -16,16 +16,18 @@
 
 import type { Handle } from "@sveltejs/kit";
 import jwt_decode from "jwt-decode";
-import { getSignOutUrl } from "$lib/auth/authUriHelpers";
-import { getTokens } from "$lib/auth/authTokens";
+import { getLogoutUrl } from "$lib/server/auth/authUriHelpers";
+import { getTokens } from "$lib/server/auth/authTokens";
 import { redirect } from "@sveltejs/kit";
 
 export const handle = (async ({ event, resolve }) => {
-	// Try to get the id token from the cookie
+	// Try to get the Cognito user id token from the cookie
 	const rawIdToken = event.cookies.get("id_token");
+	// If the id token exists
 	if (rawIdToken) {
-		// If the id token exists, parse it and add it to the locals
+		// Parse it
 		const idToken = jwt_decode<{ email: string; exp: number }>(rawIdToken);
+		// Add the user's info to the locals
 		event.locals.user = { email: idToken.email };
 	}
 
@@ -38,7 +40,7 @@ export const handle = (async ({ event, resolve }) => {
 			// if the refresh token doesn't exist
 			if (!refreshToken) {
 				// redirect to sign out and sign in again
-				const signOutUrl = getSignOutUrl();
+				const signOutUrl = getLogoutUrl();
 				throw redirect(307, signOutUrl);
 			}
 
@@ -56,7 +58,7 @@ export const handle = (async ({ event, resolve }) => {
 			} catch (error) {
 				// If the refresh token is invalid
 				// redirect to sign out and sign in again
-				const signOutUrl = getSignOutUrl();
+				const signOutUrl = getLogoutUrl();
 				throw redirect(307, signOutUrl);
 			}
 

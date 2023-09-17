@@ -16,7 +16,7 @@
 */
 
 import type { RequestHandler } from "./$types";
-import { getTokens } from "$lib/auth/authTokens";
+import { getTokens } from "$lib/server/auth/authTokens";
 import { error, redirect } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ url, cookies }) => {

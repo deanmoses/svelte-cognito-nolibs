@@ -7,8 +7,8 @@
 	This is taken from https://kinderas.com/technology/23/07/21/implementing-login-and-authentication-for-sveltekit-using-aws-cognito
 */
 
-import { PUBLIC_COGNITO_BASE_URI, PUBLIC_COGNITO_CLIENT_ID, PUBLIC_COGNITO_CLIENT_SECRET } from '$env/static/public';
-import { getRedirectUrl } from '$lib/auth/authUriHelpers';
+import { COGNITO_BASE_URI, COGNITO_CLIENT_ID, COGNITO_CLIENT_SECRET } from '$env/static/private';
+import { getLoginCallbackUrl } from '$lib/server/auth/authUriHelpers';
 
 interface Tokens {
 	access_token: string;
@@ -46,9 +46,9 @@ type TokenOptions = TokenOptionsCode | TokenOptionsRefresh;
  * @see https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html
  */
 export async function getTokens(options: TokenOptions) {
-	const baseUrl = PUBLIC_COGNITO_BASE_URI;
-	const clientId = PUBLIC_COGNITO_CLIENT_ID;
-	const clientSecret = PUBLIC_COGNITO_CLIENT_SECRET;
+	const baseUrl = COGNITO_BASE_URI;
+	const clientId = COGNITO_CLIENT_ID;
+	const clientSecret = COGNITO_CLIENT_SECRET;
 
 	// Generate the Authorization header value (basic auth) using the client ID and secret
 	const authHeader = btoa(`${clientId}:${clientSecret}`);
@@ -63,7 +63,7 @@ export async function getTokens(options: TokenOptions) {
 		grant_type: options.code ? 'authorization_code' : 'refresh_token',
 		client_id: clientId,
 		client_secret: clientSecret,
-		redirect_uri: getRedirectUrl()
+		redirect_uri: getLoginCallbackUrl()
 	};
 
 	// Add the code or refresh token to the body object depending on the options
