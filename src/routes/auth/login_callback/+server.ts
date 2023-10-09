@@ -50,11 +50,21 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			expires: refreshExpire
 		});
 
-		// Get the expire time for the id token
-		// and set a cookie.
+		// Get the expire time for the id token and set it in a cookie
 		const idExpires = new Date();
 		idExpires.setSeconds(idExpires.getSeconds() + tokens.expires_in);
 		cookies.set('id_token', tokens.id_token, { path: '/', expires: idExpires });
+
+		// Set another cookie that simply tells the front end we are dealing with
+		// a user that MIGHT be authenticatable.  This is an optimization:
+		// Cookies with secure info (like a session ID) should be set as 
+		// HttpOnly, meaning they can only be accessed server-side and not by 
+		// client scripts.  This prevents them from being stolen by malicious scripts.
+		// Therefore, if I want the client to be able to short-circuit the logic
+		// and only call the authentication back end if there's an actual chance
+		// the user might be authenticated, I neeed to set another cookie with
+		// no sensitive information.
+		cookies.set('was_authenticated', "Authenticated at " + Date.now(), { path: '/', expires: idExpires, httpOnly: false });
 
 		console.log('User is authenticated.  ID token expires at ' + idExpires.toString());
 
