@@ -18,6 +18,7 @@ import { getLogoutUrl } from '$lib/server/auth/authUriHelpers';
 export const GET: RequestHandler = async (request) => {
     await request.cookies.delete('id_token', { path: '/' });
     await request.cookies.delete('refresh_token', { path: '/' });
+    await request.cookies.delete('was_authenticated', { path: '/' });
 
 	throw redirect(302, getLogoutUrl());
 };
